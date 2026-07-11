@@ -1,0 +1,13 @@
+hilbertcurve==2.0.5
+joblib==1.4.2
+numpy==2.2.4
+pandas==2.3.3
+python-dateutil==2.9.0.post0
+pytz==2025.2
+PyYAML==6.0.2
+scikit-learn==1.7.0
+scipy==1.15.2
+six==1.17.0
+threadpoolctl==3.6.0
+tqdm==4.67.1
+tzdata==2025.2

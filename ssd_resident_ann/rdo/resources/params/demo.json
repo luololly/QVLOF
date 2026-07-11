@@ -1,0 +1,20 @@
+{
+  "dataset_group": "sift1m-small",
+  "policy": "cost-aware-greedy",
+  "window_size": 200,
+  "hot_vector_topk": 32,
+  "alpha": 1.0,
+  "switch_threshold": 0.0,
+  "candidate_labels": [
+    "base",
+    "hot",
+    "balanced"
+  ],
+  "target_systems": [
+    "pageann",
+    "spann",
+    "starling",
+    "margo",
+    "gorgeous"
+  ]
+}

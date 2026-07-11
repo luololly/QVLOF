@@ -1,0 +1,18 @@
+{
+  "dataset_group": "sift1m-small",
+  "dataset": "sift1m",
+  "vector_count": 1000,
+  "dimension": 128,
+  "distance": "l2",
+  "data_type": "float",
+  "base_vectors": "",
+  "query_vectors": "",
+  "ground_truth": "",
+  "systems": [
+    "pageann",
+    "spann",
+    "starling",
+    "margo",
+    "gorgeous"
+  ]
+}
