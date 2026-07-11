@@ -1,0 +1,9 @@
+dataset:
+  name: sift-1m
+  root_dir: ../dataset
+  archive_url: ftp://ftp.irisa.fr/local/texmex/corpus/sift.tar.gz
+
+proxy:
+  enabled: false
+  http: http://127.0.0.1:7890
+  https: http://127.0.0.1:7890
