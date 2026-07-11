@@ -1,0 +1,287 @@
+# Disk-resident dataset and artifact configuration
+
+dataset:
+  # Root path used by the reproduction environment to stage raw datasets.
+  root_dir: ../dataset
+
+  groups:
+    qvlof_paper_1m:
+      description: Datasets used by the QVLOF paper in the original 1M-scale evaluation.
+      datasets:
+        - deep1m
+        - sift1m
+        - glove
+        - gist1m
+    disk_100m_extension:
+      description: Additional 100M-scale datasets used by the disk-resident figures.
+      datasets:
+        - sift100m
+        - deep100m
+        - text2image100m_ip
+        - spacev100m
+
+  available:
+    - deep1m
+    - sift1m
+    - glove
+    - gist1m
+    - sift100m
+    - deep100m
+    - text2image100m_ip
+    - spacev100m
+
+  prepare:
+    - sift1m
+    - gist1m
+    - deep1m
+    - sift100m
+    - deep100m
+    - text2image100m_ip
+    - spacev100m
+
+  manifest:
+    deep1m:
+      paper_label: DEEP1M
+      group: qvlof_paper_1m
+      value_type: float
+      distance: l2
+      scale: 1M
+      base_file: deep_base_1m.fbin
+      query_file: query.public.10K.fbin
+      groundtruth_file: deep_gt100_1m.bin
+      note: Original QVLOF paper dataset.
+    sift1m:
+      paper_label: SIFT1M
+      group: qvlof_paper_1m
+      value_type: float
+      distance: l2
+      scale: 1M
+      base_file: sift_base.fbin
+      query_file: sift_query.fbin
+      groundtruth_file: sift_gt100.bin
+      note: Original QVLOF paper dataset.
+    glove:
+      paper_label: GLOVE
+      group: qvlof_paper_1m
+      value_type: float
+      distance: angular_or_ip
+      scale: paper
+      base_file: glove_base.fbin
+      query_file: glove_query.fbin
+      groundtruth_file: glove_gt100.bin
+      note: Original QVLOF paper dataset.
+    gist1m:
+      paper_label: GIST1M
+      group: qvlof_paper_1m
+      value_type: float
+      distance: l2
+      scale: 1M
+      base_file: gist_base.fbin
+      query_file: gist_query.fbin
+      groundtruth_file: gist_gt100.bin
+      note: Original QVLOF paper dataset.
+    sift100m:
+      paper_label: SIFT100M
+      group: disk_100m_extension
+      value_type: uint8
+      distance: l2
+      scale: 100M
+      base_file: learn.100M.u8bin
+      query_file: query.public.10K.u8bin
+      groundtruth_file: gt_PageANN_K100
+      note: Added 100M disk-resident figure dataset.
+    deep100m:
+      paper_label: DEEP100M
+      group: disk_100m_extension
+      value_type: float
+      distance: l2
+      scale: 100M
+      base_file: base.1B.fbin.crop_nb_100000000
+      query_file: query.public.10K.fbin
+      groundtruth_file: gt100-public.10K.100m_crop.l2.fbin
+      note: Added 100M disk-resident figure dataset.
+    text2image100m_ip:
+      paper_label: Text2Image (IP)
+      group: disk_100m_extension
+      value_type: float
+      distance: mips
+      scale: 100M
+      base_file: base.1B.fbin.crop_nb_100000000
+      query_file: query.heldout.30K.fbin
+      groundtruth_file: gt100-heldout.30K.100m_crop.mips.fbin
+      note: Added 100M disk-resident figure dataset for inner-product search.
+    spacev100m:
+      paper_label: SPACEV100M
+      group: disk_100m_extension
+      value_type: int8
+      distance: l2
+      scale: 100M
+      base_file: spacev1b_base.i8bin.crop_nb_100000000
+      query_file: query.i8bin
+      groundtruth_file: msspacev-gt-100M
+      note: Added 100M disk-resident figure dataset.
+
+access_profile:
+  description: Workload-side access statistics used by QSO to derive one static layout.
+  columns:
+    - query_id
+    - timestamp
+    - split
+    - vector_ids
+    - dataset_label
+  semantics:
+    vector_ids: Vector identifiers associated with the access event.
+    dataset_label: Dataset identifier aligned with dataset.manifest.
+
+workload_windows:
+  description: Window metadata used by RDO to select among candidate layouts.
+  fields:
+    - window_id
+    - start_query_id
+    - end_query_id
+    - workload_label
+    - candidate_layouts
+    - dataset_group
+
+baselines:
+  pageann:
+    upstream: https://github.com/dingyikang/PageANN
+    layout_unit: page-aligned vector group
+    data_fields:
+      - base_file
+      - query_file
+      - groundtruth_file
+      - index_prefix
+    static_qso:
+      artifact_names:
+        - new_to_old_ids_map.bin
+        - qso_pages.bin
+      import_stage: build_page_graph(...) before create_disk_layout(...)
+      rebuild_output:
+        - <index_prefix>_disk.index
+    dynamic_rdo:
+      layout_family:
+        - pageann_layout_window_<id>/
+      switch_unit: active page-layout directory or prefix
+      replay_target: sequence of page-layout builds over workload windows
+  spann:
+    upstream: https://github.com/microsoft/SPTAG
+    layout_unit: SSD posting page
+    data_fields:
+      - VectorPath
+      - QueryPath
+      - WarmupPath
+      - TruthPath
+      - IndexDirectory
+      - posting_membership.csv
+    static_qso:
+      artifact_names:
+        - qso_posting_order.bin
+        - qso_posting_pages.bin
+        - qso_vector_to_posting.bin
+      import_stage: ExtraStaticSearcher::BuildIndex(...) before posting emission
+      rebuild_output:
+        - <index_directory>/
+    dynamic_rdo:
+      layout_family:
+        - spann_layout_window_<id>/
+      switch_unit: active IndexDirectory
+      replay_target: SSD posting-layout sequence over workload windows
+  starling:
+    upstream: https://github.com/zilliztech/starling
+    layout_unit: graph partition page
+    data_fields:
+      - BASE_PATH
+      - QUERY_FILE
+      - GT_FILE
+      - INDEX_PREFIX_PATH
+    static_qso:
+      artifact_names:
+        - _partition.bin
+        - _disk.index
+      import_stage: tests/utils/index_relayout.cpp
+      rebuild_output:
+        - <index_prefix>_partition.bin
+        - <index_prefix>_disk.index
+    dynamic_rdo:
+      layout_family:
+        - starling_partition_window_<id>.bin
+        - starling_disk_window_<id>.index
+      switch_unit: active partition/index pair
+      replay_target: relaid partition family over workload windows
+  margo:
+    upstream: https://github.com/Zhang-Wenqi/MARGO
+    layout_unit: partitioned graph sector
+    data_fields:
+      - BASE_PATH
+      - QUERY_FILE
+      - GT_FILE
+      - INDEX_PREFIX_PATH
+    static_qso:
+      artifact_names:
+        - _partition.bin
+        - _disk.index
+      import_stage: save_partition(...) or tests/utils/index_relayout.cpp
+      rebuild_output:
+        - <index_prefix>_partition.bin
+        - <index_prefix>_disk.index
+    dynamic_rdo:
+      layout_family:
+        - margo_partition_window_<id>.bin
+        - margo_disk_window_<id>.index
+      switch_unit: active partition family
+      replay_target: relaid index family over workload windows
+  gorgeous:
+    upstream: https://github.com/JayLZhou/Gorgeous
+    layout_unit: graph-aware split or replicated sector group
+    data_fields:
+      - BASE_PATH
+      - QUERY_FILE
+      - GT_FILE
+      - GRAPH_PATH
+      - GRAPH_REP_INDEX_PATH
+    static_qso:
+      artifact_names:
+        - GRAPH/_partition.bin
+        - GRAPH/_disk_graph.index
+        - GRAPH_CACHE_INDEX/_partition.bin
+        - GRAPH_CACHE_INDEX/_graph_rep.index
+      import_stage: split_graph / gr_layout before index_relayout_free_mem
+      rebuild_output:
+        - GRAPH/_disk_graph.index
+        - GRAPH_CACHE_INDEX/_graph_rep.index
+    dynamic_rdo:
+      layout_family:
+        - gorgeous_graph_layout_window_<id>/
+      switch_unit: active graph-aware artifact family and runtime toggles
+      replay_target: graph-layout family over workload windows
+
+requirements:
+  common:
+    - C++17 compiler
+    - CMake
+    - Python 3
+    - binary vector readers for fbin/ibin/u8bin-style files
+  system_groups:
+    pageann:
+      - page graph generation utility
+      - disk layout materialization utility
+    spann:
+      - SSD posting builder
+      - SSD serving runtime
+      - ini-file configuration support
+    starling:
+      - graph partition utility
+      - index_relayout utility
+    margo:
+      - graph partitioner
+      - index_relayout utility
+    gorgeous:
+      - graph split relayout path
+      - graph replica relayout path
+      - asynchronous file I/O runtime
+
+proxy:
+  enabled: false
+  http: http://127.0.0.1:7890
+  https: http://127.0.0.1:7890

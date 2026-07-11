@@ -1,0 +1,42 @@
+Parameter Name,PageANN,Starling,MARGO,Gorgeous,SPANN,Remarks
+R / max_degree,"{64}","{64}","{64}","{64}",N/A,"SPANN has no literal R/max_degree parameter; its comparable graph-degree parameter is listed separately as BuildHead.NeighborhoodSize"
+LBUILD / BUILD_L,"{75,100,125,150}","{75,100,125,150}","{75,100,125,150}","{75,100,125,150}",N/A,
+search_list / LS,"{10,20,30,50,100,150,300,500,1000}","{10,20,30,50,100,150,300,500,1000}","{10,20,30,50,100,150,300,500,1000}","{10,20,30,50,100,150,300,500,1000}",N/A,
+beamwidth / BM_LIST,"{4,8,16}","{4,8,16}","{4,8,16}","{4,8,16}",N/A,
+min_degree_per_node,"{21}",N/A,N/A,N/A,N/A,"Derived from R=64 as floor(R/3)=21"
+num_PQ_chunks,"{12,16,20,24}",N/A,N/A,N/A,N/A,
+use_hash_routing,"{false,true}",N/A,N/A,N/A,N/A,
+use_sampled_hash_routing,"{false,true}",N/A,N/A,N/A,N/A,
+radius,"{0,1,2}",N/A,N/A,N/A,N/A,
+sample_ratio,"{0.2,0.5,0.7,1.0}",N/A,N/A,N/A,N/A,
+num_pages_to_cache / num_nodes_to_cache,"{ceil(10000/nnodes_per_page),ceil(100000/nnodes_per_page),ceil(1000000/nnodes_per_page)}","{10000,100000,1000000}","{10000,100000,1000000}",0,N/A,
+MEM_R,N/A,"{16,24,32,64}","{16,24,32,64}","{16,24,32,64}",N/A,
+MEM_BUILD_L,N/A,"{75,100,125,150}","{75,100,125,150}","{75,100,125,150}",N/A,
+MEM_RAND_SAMPLING_RATE / mu,N/A,"{0.001,0.005,0.01,0.1}","{0.001,0.005,0.01,0.1}","{0.001,0.005,0.01,0.1}",N/A,
+MEM_L,N/A,"{0,16,32}","{0,16,32}","{0,16,32}",N/A,
+USE_PAGE_SEARCH,N/A,"{0,1}","{0,1}","{0,1}",N/A,
+PS_USE_RATIO,N/A,"{0.3,0.5,0.7,1.0}","{0.3,0.5,0.7,1.0}","{0.3,0.5,0.7,1.0}",N/A,
+GP_TIMES,N/A,"{8,16}","{8,16}","{8,16}",N/A,
+GP_CUT,N/A,4096,4096,4096,N/A,
+USE_SQ,N/A,"{0,1}","{0,1}",N/A,N/A,
+nlist,N/A,N/A,"{1,32,64,128,256}",N/A,N/A,
+N_PQ_CODE,N/A,N/A,N/A,"{2,4}",N/A,
+PQ_FILTER_RATIO,N/A,N/A,N/A,"{0.8,0.9,1.0}",N/A,"Questionable: likely ineffective on Gorgeous current graph-replicated main path; clearly consumed only in non-graph-replicated page_search(...)"
+MEM_GRAPH_USE_RATIO,N/A,N/A,N/A,"{0.0,0.5,1.0}",N/A,"Implementation-level graph-cache split, not a paper-level primary scan axis"
+MEM_EMB_USE_RATIO,N/A,N/A,N/A,"{0.0,0.5,1.0}",N/A,"Implementation-level node/vector-cache split, not a paper-level primary scan axis"
+EMB_SEARCH_RATIO,N/A,N/A,N/A,"{0.2,0.4,0.6,0.8,1.0}",N/A,"Paper refinement ratio sigma; directly analyzed in Figure 5"
+DECO_IMPL,N/A,N/A,N/A,"{0,1}",N/A,
+USE_DISK_GRAPH_CACHE_INDEX,N/A,N/A,N/A,"{0,1}",N/A,
+BuildSSDIndex.InternalResultNum,N/A,N/A,N/A,N/A,"{32,64,96,128}",
+BuildSSDIndex.SearchInternalResultNum,N/A,N/A,N/A,N/A,"{16,32,48,64,80,96,112,128,192,224,256,288,320,384}",
+BuildSSDIndex.ReplicaCount,N/A,N/A,N/A,N/A,"{2,4,8}",
+BuildSSDIndex.PostingPageLimit,N/A,N/A,N/A,N/A,"{3,4,12}",
+SearchSSDIndex.InternalResultNum,N/A,N/A,N/A,N/A,"{16,32,48,64,80,96,112,128,192,224,256,288,320,384}",
+SearchSSDIndex.MaxCheck,N/A,N/A,N/A,N/A,"{1024,2048,4096,8192}",
+SearchSSDIndex.SearchPostingPageLimit,N/A,N/A,N/A,N/A,"{3,4,12}",
+SearchSSDIndex.MaxDistRatio,N/A,N/A,N/A,N/A,"{8.0,16.0,32.0,1000000}",
+SelectHead.Ratio,N/A,N/A,N/A,N/A,"{0.10,0.12,0.15,0.16,0.20}",
+SelectHead.SelectThreshold,N/A,N/A,N/A,N/A,"{10,12,50}",
+BuildHead.NeighborhoodSize,N/A,N/A,N/A,N/A,"{32}",
+BuildHead.MaxCheckForRefineGraph,N/A,N/A,N/A,N/A,"{4096,8192,10000}",
+BuildHead.RNGFactor,N/A,N/A,N/A,N/A,"{1.0,10.0}",
